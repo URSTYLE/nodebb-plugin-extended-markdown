@@ -131,25 +131,29 @@ function applyExtendedMarkdown(textContent) {
 function applyGroupCode(textContent, id) {
     if (textContent.match(codeTabRegex)) {
         let count = 0;
-        textContent = textContent.replace(codeTabRegex, (match, codes) => {
-            // code is the first match, the full grouped code without the start ===group and the end ===
-            let codeArray = codes.substring(5, codes.length - 6).split(/<\/pre>\n<pre>/g); // remove first and last <pre> then split between all lang
-            let lang = [];
-            for (let i in codeArray) {
-                lang[i] = langCodeRegex.exec(codeArray[i])[1]; // extract lang for code
-                codeArray[i] = "<pre>" + codeArray[i] + "</pre>\n"; // add pre at the start and at the end of all code
-            }
-            let menuTab = "<ul class='nav nav-tabs' role='tablist'>";
-            let contentTab = "<div class='tab-content'>";
-            for (let i = 0; i < lang.length; i++) {
-                menuTab += `<li role='presentation' ${i === 0 ? "class='active'" : ""}><a href='#${lang[i] + count + id}' aria-controls='${lang[i]}' role='tab' data-toggle='tab'>${capitalizeFirstLetter(lang[i])}</a></li>`;
-                contentTab += `<div role="tabpanel" class="tab-pane ${i === 0 ? "active" : ""}" id="${lang[i] + count + id}">${codeArray[i]}</div>`;
-            }
-            menuTab += "</ul>";
-            contentTab += "</div>";
-            count++;
-            return menuTab + contentTab;
-        });
+        try {
+            textContent = textContent.replace(codeTabRegex, (match, codes) => {
+                // code is the first match, the full grouped code without the start ===group and the end ===
+                let codeArray = codes.substring(5, codes.length - 6).split(/<\/pre>\n<pre>/g); // remove first and last <pre> then split between all lang
+                let lang = [];
+                for (let i in codeArray) {
+                    lang[i] = langCodeRegex.exec(codeArray[i])[1]; // extract lang for code
+                    codeArray[i] = "<pre>" + codeArray[i] + "</pre>\n"; // add pre at the start and at the end of all code
+                }
+                let menuTab = "<ul class='nav nav-tabs' role='tablist'>";
+                let contentTab = "<div class='tab-content'>";
+                for (let i = 0; i < lang.length; i++) {
+                    menuTab += `<li role='presentation' ${i === 0 ? "class='active'" : ""}><a href='#${lang[i] + count + id}' aria-controls='${lang[i]}' role='tab' data-toggle='tab'>${capitalizeFirstLetter(lang[i])}</a></li>`;
+                    contentTab += `<div role="tabpanel" class="tab-pane ${i === 0 ? "active" : ""}" id="${lang[i] + count + id}">${codeArray[i]}</div>`;
+                }
+                menuTab += "</ul>";
+                contentTab += "</div>";
+                count++;
+                return menuTab + contentTab;
+            });
+        } catch(err) {
+          console.error(err);
+        }
     }
     return textContent;
 }
